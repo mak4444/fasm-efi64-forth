@@ -1,0 +1,405 @@
+;/
+;/1 VALUE R/O ( -- fam ) \ 94 FILE
+
+_RrslO:
+	call	_DOVALUE	; 80415574 E8 6B F1 FE FF 
+
+	DQ 0x1
+;/
+;/2 VALUE W/O ( -- fam ) \ 94 FILE
+
+_WrslO:
+	call	_DOVALUE	; 80415581 E8 5E F1 FE FF 
+
+	DQ 0x2
+;/
+;/3 VALUE R/W ( -- fam ) \ 94 FILE
+
+_RrslW:
+	call	_DOVALUE	; 8041558E E8 51 F1 FE FF 
+
+	DQ 0x3
+;/
+;/: CFNAME-SET  ( adr len -- )
+;/ DUP 1+ >R  CURFILENAME CURFILENAME R@ + CFNAME_SIZE R> - CMOVE>
+
+_CFNAMEsubSET:
+	call	_DUP	; 8041559B E8 88 EF FE FF 
+	call	_CHARadd	; 804155A0 E8 D6 EE FE FF 
+	Push	rax	; 804155A5 50 
+;/*	mov	0x00(rbp),rax	; 804155A6 
+	DB 0x48,0x8B,0x45,0x0
+;/*	mov	rax,0x00(rbp)	; 804155AA 
+	DB 0x48,0x89,0x45,0x0
+;/*	lea	_xc+0x1D (%rip),rax	; 804155AE 
+	DB 0x48,0x8D,0x5,0x5F,0xE2,0xFF,0xFF
+;/*	mov	rax,-0x08(rbp)	; 804155B5 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_xc+0x1D (%rip),rax	; 804155B9 
+	DB 0x48,0x8D,0x5,0x54,0xE2,0xFF,0xFF
+;/*	mov	rax,-0x10(rbp)	; 804155C0 
+	DB 0x48,0x89,0x45,0xF0
+;/*	mov	(rsp),rax	; 804155C4 
+	DB 0x48,0x8B,0x4,0x24
+;/*	lea	-0x10(rbp),rbp	; 804155C8 
+	DB 0x48,0x8D,0x6D,0xF0
+	call	_add	; 804155CC E8 4A EE FE FF 
+;/*	mov	rax,-0x08(rbp)	; 804155D1 
+	DB 0x48,0x89,0x45,0xF8
+;/*	mov	$0x1BC,eax	; 804155D5 
+	DB 0xB8,0xBC,0x1,0x0,0x0
+;/*	mov	rax,-0x10(rbp)	; 804155DA 
+	DB 0x48,0x89,0x45,0xF0
+	pop	rax	; 804155DE 58 
+;/*	lea	-0x10(rbp),rbp	; 804155DF 
+	DB 0x48,0x8D,0x6D,0xF0
+	call	_sub	; 804155E3 E8 30 EE FE FF 
+	call	_CMOVEgreat	; 804155E8 E8 BC F0 FE FF 
+;/CURFILENAME $! ;
+;/*	mov	rax,-0x08(rbp)	; 804155ED 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_xc+0x1D (%rip),rax	; 804155F1 
+	DB 0x48,0x8D,0x5,0x1C,0xE2,0xFF,0xFF
+;/*	lea	-0x08(rbp),rbp	; 804155F8 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_dolsave	; 804155FC E8 48 6 FF FF 
+	ret		; 80415601 C3 
+;/
+;/: CFNAME-FREE  ( -- )
+;/ CURFILENAME COUNT + CURFILENAME
+
+
+_CFNAMEsubFREE:
+;/*	mov	rax,-0x08(rbp)	; 80415602 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_xc+0x1D (%rip),rax	; 80415606 
+	DB 0x48,0x8D,0x5,0x7,0xE2,0xFF,0xFF
+;/*	lea	-0x08(rbp),rbp	; 8041560D 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_COUNT	; 80415611 E8 AB EC FE FF 
+	call	_add	; 80415616 E8 0 EE FE FF 
+;/*	mov	rax,-0x08(rbp)	; 8041561B 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_xc+0x1D (%rip),rax	; 8041561F 
+	DB 0x48,0x8D,0x5,0xEE,0xE1,0xFF,0xFF
+;/*	mov	rax,-0x10(rbp)	; 80415626 
+	DB 0x48,0x89,0x45,0xF0
+;/ CFNAME_SIZE CURFILENAME C@ - 255 +  CMOVE ;
+;/*	mov	$0x1BC,eax	; 8041562A 
+	DB 0xB8,0xBC,0x1,0x0,0x0
+;/*	mov	rax,-0x18(rbp)	; 8041562F 
+	DB 0x48,0x89,0x45,0xE8
+;/*	lea	_xc+0x1D (%rip),rax	; 80415633 
+	DB 0x48,0x8D,0x5,0xDA,0xE1,0xFF,0xFF
+;/*	lea	-0x18(rbp),rbp	; 8041563A 
+	DB 0x48,0x8D,0x6D,0xE8
+	call	_Cload	; 8041563E E8 8A EB FE FF 
+	call	_sub	; 80415643 E8 D0 ED FE FF 
+;/*	mov	rax,-0x08(rbp)	; 80415648 
+	DB 0x48,0x89,0x45,0xF8
+;/*	mov	$0xFF,eax	; 8041564C 
+	DB 0xB8,0xFF,0x0,0x0,0x0
+;/*	lea	-0x08(rbp),rbp	; 80415651 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_add	; 80415655 E8 C1 ED FE FF 
+	call	_CMOVE	; 8041565A E8 6E F0 FE FF 
+	ret		; 8041565F C3 
+;/
+;/: INCLUDE-FILE ( i*x fileid -- j*x ) \ 94 FILE
+;/	>IN  @ >R
+
+
+_INCLUDEsubFILE:
+;/*	mov	rax,-0x08(rbp)	; 80415660 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_6XSYS+0x27C (%rip),rax	; 80415664 
+	DB 0x48,0x8D,0x5,0x8D,0xF4,0xFE,0xFF
+;/*	lea	-0x08(rbp),rbp	; 8041566B 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_load	; 8041566F E8 55 EB FE FF 
+	Push	rax	; 80415674 50 
+;/*	mov	0x00(rbp),rax	; 80415675 
+	DB 0x48,0x8B,0x45,0x0
+;/*	mov	rax,0x00(rbp)	; 80415679 
+	DB 0x48,0x89,0x45,0x0
+;/	CURSTR @ >R CURSTR 0!
+;/*	lea	_OKdot+0xF (%rip),rax	; 8041567D 
+	DB 0x48,0x8D,0x5,0x34,0xDF,0xFF,0xFF
+	call	_load	; 80415684 E8 40 EB FE FF 
+	Push	rax	; 80415689 50 
+;/*	mov	0x00(rbp),rax	; 8041568A 
+	DB 0x48,0x8B,0x45,0x0
+;/*	mov	rax,0x00(rbp)	; 8041568E 
+	DB 0x48,0x89,0x45,0x0
+;/*	lea	_OKdot+0xF (%rip),rax	; 80415692 
+	DB 0x48,0x8D,0x5,0x1F,0xDF,0xFF,0xFF
+	call	_OFF	; 80415699 E8 DB EB FE FF 
+;/	SOURCE-ID >R  TO SOURCE-ID
+;/*	mov	rax,-0x08(rbp)	; 8041569E 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_SOURCEsubID+0x5 (%rip),rax	; 804156A2 
+	DB 0x48,0x8D,0x5,0xC,0xCE,0xFF,0xFF
+;/*	mov	(rax),rax	; 804156A9 
+	DB 0x48,0x8B,0x0
+	Push	rax	; 804156AC 50 
+;/*	mov	-0x08(rbp),rax	; 804156AD 
+	DB 0x48,0x8B,0x45,0xF8
+;/*	mov	rax,-0x08(rbp)	; 804156B1 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_SOURCEsubID+0x5 (%rip),rax	; 804156B5 
+	DB 0x48,0x8D,0x5,0xF9,0xCD,0xFF,0xFF
+;/*	lea	-0x08(rbp),rbp	; 804156BC 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_save	; 804156C0 E8 3B EB FE FF 
+;/	SOURCE
+	call	_SOURCE	; 804156C5 E8 0 CE FF FF 
+;/	RP@ OVER QALIGNED - RP!
+	call	_RPload	; 804156CA E8 56 EA FE FF 
+	call	_OVER	; 804156CF E8 C5 EE FE FF 
+	call	_QALIGNED	; 804156D4 E8 D5 2 FF FF 
+	call	_sub	; 804156D9 E8 3A ED FE FF 
+	call	_RPsave	; 804156DE E8 59 EA FE FF 
+;/	RP@ SWAP CMOVE
+	call	_RPload	; 804156E3 E8 3D EA FE FF 
+	call	_SWAP	; 804156E8 E8 55 EE FE FF 
+	call	_CMOVE	; 804156ED E8 DB EF FE FF 
+;/	SOURCE 2>R 
+	call	_SOURCE	; 804156F2 E8 D3 CD FF FF 
+	call	_2greatR	; 804156F7 E8 91 EA FE FF 
+;/	['] FQUIT CATCH	SAVEERR	
+;/*	mov	rax,-0x08(rbp)	; 804156FC 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_FQUIT(%rip),rax	; 80415700 
+	DB 0x48,0x8D,0x5,0x94,0xE0,0xFF,0xFF
+;/*	lea	-0x08(rbp),rbp	; 80415707 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_CATCH	; 8041570B E8 94 8 FF FF 
+	call	_SAVEERR	; 80415710 E8 85 E6 FF FF 
+;/	DUP  IF cr ." in <" CURFILENAME COUNT TYPE ." >:" CURSTR @ . THEN
+	call	_DUP	; 80415715 E8 E EE FE FF 
+	test	rax,rax	; 8041571A 48 85 C0 
+;/*	mov	0x00(rbp),rax	; 8041571D 
+	DB 0x48,0x8B,0x45,0x0
+;/*	lea	0x08(rbp),rbp	; 80415721 
+	DB 0x48,0x8D,0x6D,0x8
+;/*	jz	_INCLUDEsubFILE+0x11E 	; 80415725 
+	DB 0xF,0x84,0x53,0x0,0x0,0x0
+	call	_CR	; 8041572B E8 74 FF FE FF 
+	call	_cbigSdticcend	; 80415730 E8 28 3 FF FF 
+	DB 0x4,0x69,0x6E,0x20,0x3C
+	call	_TYPE	; 8041573A E8 33 FF FE FF 
+;/*	mov	rax,-0x08(rbp)	; 8041573F 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_xc+0x1D (%rip),rax	; 80415743 
+	DB 0x48,0x8D,0x5,0xCA,0xE0,0xFF,0xFF
+;/*	lea	-0x08(rbp),rbp	; 8041574A 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_COUNT	; 8041574E E8 6E EB FE FF 
+	call	_TYPE	; 80415753 E8 1A FF FE FF 
+	call	_cbigSdticcend	; 80415758 E8 0 3 FF FF 
+	DB 0x2,0x3E,0x3A
+	call	_TYPE	; 80415760 E8 D FF FE FF 
+;/*	mov	rax,-0x08(rbp)	; 80415765 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_OKdot+0xF (%rip),rax	; 80415769 
+	DB 0x48,0x8D,0x5,0x48,0xDE,0xFF,0xFF
+;/*	lea	-0x08(rbp),rbp	; 80415770 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_load	; 80415774 E8 50 EA FE FF 
+	call	_dot	; 80415779 E8 1 B8 FF FF 
+;/	2R> SOURCE!
+	call	_2Rgreat	; 8041577E E8 D2 E9 FE FF 
+	call	_SOURCEsave	; 80415783 E8 65 CD FF FF 
+;/	RP@ SOURCE CMOVE
+	call	_RPload	; 80415788 E8 98 E9 FE FF 
+	call	_SOURCE	; 8041578D E8 38 CD FF FF 
+	call	_CMOVE	; 80415792 E8 36 EF FE FF 
+;/	RP@ SOURCE NIP QALIGNED + RP!
+	call	_RPload	; 80415797 E8 89 E9 FE FF 
+	call	_SOURCE	; 8041579C E8 29 CD FF FF 
+	call	_NIP	; 804157A1 E8 66 EE FE FF 
+	call	_QALIGNED	; 804157A6 E8 3 2 FF FF 
+	call	_add	; 804157AB E8 6B EC FE FF 
+	call	_RPsave	; 804157B0 E8 87 E9 FE FF 
+;/	R> TO SOURCE-ID
+;/*	mov	rax,-0x08(rbp)	; 804157B5 
+	DB 0x48,0x89,0x45,0xF8
+	pop	rax	; 804157B9 58 
+;/*	mov	rax,-0x10(rbp)	; 804157BA 
+	DB 0x48,0x89,0x45,0xF0
+;/*	lea	_SOURCEsubID+0x5 (%rip),rax	; 804157BE 
+	DB 0x48,0x8D,0x5,0xF0,0xCC,0xFF,0xFF
+;/*	lea	-0x10(rbp),rbp	; 804157C5 
+	DB 0x48,0x8D,0x6D,0xF0
+	call	_save	; 804157C9 E8 32 EA FE FF 
+;/	R> CURSTR !
+;/*	mov	rax,-0x08(rbp)	; 804157CE 
+	DB 0x48,0x89,0x45,0xF8
+	pop	rax	; 804157D2 58 
+;/*	mov	rax,-0x10(rbp)	; 804157D3 
+	DB 0x48,0x89,0x45,0xF0
+;/*	lea	_OKdot+0xF (%rip),rax	; 804157D7 
+	DB 0x48,0x8D,0x5,0xDA,0xDD,0xFF,0xFF
+;/*	lea	-0x10(rbp),rbp	; 804157DE 
+	DB 0x48,0x8D,0x6D,0xF0
+	call	_save	; 804157E2 E8 19 EA FE FF 
+;/	R> >IN ! THROW  
+;/*	mov	rax,-0x08(rbp)	; 804157E7 
+	DB 0x48,0x89,0x45,0xF8
+	pop	rax	; 804157EB 58 
+;/*	mov	rax,-0x10(rbp)	; 804157EC 
+	DB 0x48,0x89,0x45,0xF0
+;/*	lea	_6XSYS+0x27C (%rip),rax	; 804157F0 
+	DB 0x48,0x8D,0x5,0x1,0xF3,0xFE,0xFF
+;/*	lea	-0x10(rbp),rbp	; 804157F7 
+	DB 0x48,0x8D,0x6D,0xF0
+	call	_save	; 804157FB E8 0 EA FE FF 
+	call	_THROW	; 80415800 E8 C 8 FF FF 
+;/;
+	ret		; 80415805 C3 
+;/
+;/T: VIEW_{
+;/?YDP><DP
+
+
+_VIEW_lsk:
+	call	_queYDPgreatlessDP	; 80415806 E8 A6 F1 FF FF 
+;/   HERE VIEW_LINK , TO VIEW_LINK  0 ,
+	call	_HERE	; 8041580B E8 85 C1 FF FF 
+;/*	mov	rax,-0x08(rbp)	; 80415810 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_VIEW_LINK+0x5 (%rip),rax	; 80415814 
+	DB 0x48,0x8D,0x5,0xBC,0xF1,0xFF,0xFF
+;/*	mov	(rax),rax	; 8041581B 
+	DB 0x48,0x8B,0x0
+;/*	lea	-0x08(rbp),rbp	; 8041581E 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_com	; 80415822 E8 B4 F5 FE FF 
+;/*	mov	rax,-0x08(rbp)	; 80415827 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_VIEW_LINK+0x5 (%rip),rax	; 8041582B 
+	DB 0x48,0x8D,0x5,0xA5,0xF1,0xFF,0xFF
+;/*	lea	-0x08(rbp),rbp	; 80415832 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_save	; 80415836 E8 C5 E9 FE FF 
+;/*	mov	rax,-0x08(rbp)	; 8041583B 
+	DB 0x48,0x89,0x45,0xF8
+;/*	mov	$0x0,eax	; 8041583F 
+	DB 0xB8,0x0,0x0,0x0,0x0
+;/*	lea	-0x08(rbp),rbp	; 80415844 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_com	; 80415848 E8 8E F5 FE FF 
+;/?YDP><DP
+	call	_queYDPgreatlessDP	; 8041584D E8 5F F1 FF FF 
+;/;
+	ret		; 80415852 C3 
+;/
+;/T: }VIEW
+;/?YDP><DP
+
+
+_rskVIEW:
+	call	_queYDPgreatlessDP	; 80415853 E8 59 F1 FF FF 
+;/   HERE  VIEW_LINK , TO VIEW_LINK -1 ,
+	call	_HERE	; 80415858 E8 38 C1 FF FF 
+;/*	mov	rax,-0x08(rbp)	; 8041585D 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_VIEW_LINK+0x5 (%rip),rax	; 80415861 
+	DB 0x48,0x8D,0x5,0x6F,0xF1,0xFF,0xFF
+;/*	mov	(rax),rax	; 80415868 
+	DB 0x48,0x8B,0x0
+;/*	lea	-0x08(rbp),rbp	; 8041586B 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_com	; 8041586F E8 67 F5 FE FF 
+;/*	mov	rax,-0x08(rbp)	; 80415874 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_VIEW_LINK+0x5 (%rip),rax	; 80415878 
+	DB 0x48,0x8D,0x5,0x58,0xF1,0xFF,0xFF
+;/*	lea	-0x08(rbp),rbp	; 8041587F 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_save	; 80415883 E8 78 E9 FE FF 
+;/*	mov	rax,-0x08(rbp)	; 80415888 
+	DB 0x48,0x89,0x45,0xF8
+;/*	movq	$-0x1,rax	; 8041588C 
+	DB 0x48,0xC7,0xC0,0xFF,0xFF,0xFF,0xFF
+;/*	lea	-0x08(rbp),rbp	; 80415893 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_com	; 80415897 E8 3F F5 FE FF 
+;/   CURFILENAME COUNT S",
+;/*	mov	rax,-0x08(rbp)	; 8041589C 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_xc+0x1D (%rip),rax	; 804158A0 
+	DB 0x48,0x8D,0x5,0x6D,0xDF,0xFF,0xFF
+;/*	lea	-0x08(rbp),rbp	; 804158A7 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_COUNT	; 804158AB E8 11 EA FE FF 
+	call	_Sdticcom	; 804158B0 E8 23 E8 FF FF 
+;/?YDP><DP
+	call	_queYDPgreatlessDP	; 804158B5 E8 F7 F0 FF FF 
+;/;
+	ret		; 804158BA C3 
+;/
+;/T: INCLUDED  ( c-addr u ---- )
+;/\ Open the file with name c-addr u and interpret all lines contained in it.
+;/\	CR RP@ 6 >> $F AND SPACES ." TO   <" 2DUP TYPE ." >"
+;/	2DUP	R/O  OPEN-FILE THROW >R
+
+
+_INCLUDED:
+	call	_2DUP	; 804158BB E8 71 EC FE FF 
+;/*	mov	rax,-0x08(rbp)	; 804158C0 
+	DB 0x48,0x89,0x45,0xF8
+;/*	lea	_RrslO+0x5 (%rip),rax	; 804158C4 
+	DB 0x48,0x8D,0x5,0xAE,0xFC,0xFF,0xFF
+;/*	mov	(rax),rax	; 804158CB 
+	DB 0x48,0x8B,0x0
+;/*	lea	-0x08(rbp),rbp	; 804158CE 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_OPENsubFILE	; 804158D2 E8 62 D9 FF FF 
+	call	_THROW	; 804158D7 E8 35 7 FF FF 
+	Push	rax	; 804158DC 50 
+;/*	mov	0x00(rbp),rax	; 804158DD 
+	DB 0x48,0x8B,0x45,0x0
+;/*	lea	0x08(rbp),rbp	; 804158E1 
+	DB 0x48,0x8D,0x6D,0x8
+;/	CFNAME-SET
+	call	_CFNAMEsubSET	; 804158E5 E8 B1 FC FF FF 
+;/        VIEW_{
+	call	_VIEW_lsk	; 804158EA E8 17 FF FF FF 
+;/	R@ ['] INCLUDE-FILE
+;/*	mov	rax,-0x08(rbp)	; 804158EF 
+	DB 0x48,0x89,0x45,0xF8
+;/*	mov	(rsp),rax	; 804158F3 
+	DB 0x48,0x8B,0x4,0x24
+;/*	mov	rax,-0x10(rbp)	; 804158F7 
+	DB 0x48,0x89,0x45,0xF0
+;/*	lea	_INCLUDEsubFILE(%rip),rax	; 804158FB 
+	DB 0x48,0x8D,0x5,0x5E,0xFD,0xFF,0xFF
+;/*	lea	-0x10(rbp),rbp	; 80415902 
+	DB 0x48,0x8D,0x6D,0xF0
+;/	CATCH
+	call	_CATCH	; 80415906 E8 99 6 FF FF 
+;/	}VIEW
+	call	_rskVIEW	; 8041590B E8 43 FF FF FF 
+;/	CFNAME-FREE
+	call	_CFNAMEsubFREE	; 80415910 E8 ED FC FF FF 
+;/	R> CLOSE-FILE DROP
+;/*	mov	rax,-0x08(rbp)	; 80415915 
+	DB 0x48,0x89,0x45,0xF8
+	pop	rax	; 80415919 58 
+;/*	lea	-0x08(rbp),rbp	; 8041591A 
+	DB 0x48,0x8D,0x6D,0xF8
+	call	_CLOSEsubFILE	; 8041591E E8 23 D9 FF FF 
+	call	_DgreatS	; 80415923 E8 B E8 FE FF 
+;/	THROW
+	call	_THROW	; 80415928 E8 E4 6 FF FF 
+;/;
+	ret		; 8041592D C3 
+;/
+;/: FLOAD  PARSE-NAME INCLUDED ;
+
+
+_FLOAD:
+	call	_PARSEsubNAME	; 8041592E E8 E3 CD FF FF 
+	call	_INCLUDED	; 80415933 E8 83 FF FF FF 
+	ret		; 80415938 C3 

@@ -1,0 +1,72 @@
+
+: [TTERR]
+  >R
+  OVER = IF  DROP R> COUNT TYPE RDROP BREAK
+  RDROP ;
+
+: EFI_ERRORS>
+   ['] (C") COMPILE, 0 PARSE S",
+   POSTPONE [TTERR] ; IMMEDIATE
+
+: EFI_ERRORS.  ( u -- ) 
+   $FF AND   ." EFI " 
+1  EFI_ERRORS> Load Error
+2  EFI_ERRORS> Invalid Parameter
+3  EFI_ERRORS> Unsupported
+4  EFI_ERRORS> Bad Buffer Size
+5  EFI_ERRORS> Buffer Too Small
+6  EFI_ERRORS> Not Ready
+7  EFI_ERRORS> Device Error
+8  EFI_ERRORS> Write Protected
+9  EFI_ERRORS> Out of Resources
+10 EFI_ERRORS> Volume Corrupt
+11 EFI_ERRORS> Volume Full
+12 EFI_ERRORS> No Media
+13 EFI_ERRORS> Media changed
+14 EFI_ERRORS> Not Found
+15 EFI_ERRORS> Access Denied
+16 EFI_ERRORS> No Response
+17 EFI_ERRORS> No mapping
+18 EFI_ERRORS> Time out
+19 EFI_ERRORS> Not started
+20 EFI_ERRORS> Already started
+21 EFI_ERRORS> Aborted
+22 EFI_ERRORS> ICMP Error
+23 EFI_ERRORS> TFTP Error
+24 EFI_ERRORS> Protocol Error
+25 EFI_ERRORS> Incompatible Version
+26 EFI_ERRORS> Security Violation
+27 EFI_ERRORS> CRC_ERROR                   
+28 EFI_ERRORS> END_OF_MEDIA     
+31 EFI_ERRORS> END_OF_FILE      
+32 EFI_ERRORS> INVALID_LANGUAGE            
+33 EFI_ERRORS> COMPROMISED_DATA            
+34 EFI_ERRORS> IP_ADDRESS_CONFLICT         
+35 EFI_ERRORS> HTTP_ERROR                  
+ DROP
+;
+
+:NONAME
+ DUP  $30 >> $8000 =
+ IF EFI_ERRORS. BREAK
+  	CR ." ERR=" . 
+; ->DEFER ERROR_.
+
+: EFI_ERROR_DO
+
+	DUP 0= IF DROP BREAK	
+	SAVEERR
+	COLOR@ >R
+	EFI_RED COLOR! 
+	CR ERRTIB COUNT TYPE CR
+	ERRTIB 1+ ER>IN @ $3F AND 0
+   ?DO COUNT 9 = IF 9 EMIT ELSE SPACE THEN  LOOP DROP
+ ." ^" \ DROP
+
+	ERROR_.
+
+	R> COLOR!
+	CR  SP0 @ SP!   STATE 0!
+;
+
+' EFI_ERROR_DO TO ERROR_DO

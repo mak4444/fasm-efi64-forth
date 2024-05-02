@@ -1,0 +1,65 @@
+
+: FSTART
+
+  SP@ SP0 !
+  RP@ RP0 !
+  ORIGVIEWLINK TO VIEW_LINK
+
+    S" autoexec.4th" ['] INCLUDED CATCH    ?DUP
+    IF ERROR_DO
+    THEN
+
+  MAIN_CYCLE
+;
+
+: WORDS0
+  CONTEXT @ @
+ BEGIN DUP
+ WHILE DUP ID. SPACE CDR
+ REPEAT DROP ;
+
+VARIABLE loaded_image
+VARIABLE IOVolume
+VARIABLE &VOLUME
+
+:  FMAIN DP !
+    ." Forth run" CR
+  SYSTAB *BootServices @ TO BOOTSERV
+
+  TEXTINPUEX
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL_GUID
+  SYSTAB ConsoleInHandle @
+  BOOTSERV HandleProtocol @
+ 3XSYS IF ." HandleProtocol error" THEN
+
+ 0 0x1ffff 0 0 BOOTSERV SetWatchdogTimer @ 4XSYS IF ." Watchdog error" THEN
+
+ loaded_image
+ EFI_LOADED_IMAGE_PROTOCOL_GUID
+ IMAGEHANDLE
+ BOOTSERV HandleProtocol @
+ 3XSYS
+ ."  loaded_image INIT "
+ IF ." error" ELSE ."  OK" THEN CR
+
+ IOVolume
+ EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
+ loaded_image @ LP_DeviceHandle @
+ BOOTSERV HandleProtocol @
+."  IOVolume  INIT " \ KEY DROP
+ 3XSYS
+ IF ." error" ELSE ." OK" THEN CR
+
+ &VOLUME
+ IOVolume @ DUP OpenVolume @
+ ."  VOLUME INIT" 2DUP H. H.
+ 2XSYS
+ IF ." error" ELSE ." OK" THEN CR
+ &VOLUME @ TO VOLUME
+FSTART
+;
+
+\EOF
+77 CONSTANT SSS SSS .
+: XXX 666 . ; XXX
+

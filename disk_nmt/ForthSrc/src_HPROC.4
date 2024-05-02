@@ -1,0 +1,549 @@
+	
+\- DOCREATE	: DOCREATE	R> ;
+\- DOCONSTANT	: DOCONSTANT	R> @ ;
+\- DOVALUE	: DOTVALUE	R> @ ;
+\- DOVECT 	: DOVECT	R> PERFORM ;
+\- DOFIELD	: DOFIELD	R> L@ + ;
+
+' DOCREATE TO 'DOCREATE
+' DOCONSTANT TO 'DOCONSTANT
+' DOVALUE TO 'DOVALUE
+' DOVECT TO 'DOVECT
+' DOFIELD TO 'DOFIELD
+
+VARIABLE SP0
+VARIABLE &INPUT
+VARIABLE &INPUT?
+
+VARIABLE &OUTPUT
+
+1 VALUE H-STDOUT
+
+CREATE &START_INIT ' NOOP ,
+\ CREATE DP ' DPBuff ,
+VARIABLE DP
+
+VARIABLE EMITVAR
+
+T: THERE DP @ ;
+
+T: ALLOT DP +! ;
+
+T: DP! DP ! ;
+
+T: ,   THERE ! 8 ALLOT ;
+
+T: L, THERE L! 4 ALLOT ;
+
+T: W, THERE W! 2 ALLOT ;
+
+T: C, THERE C! 1 ALLOT ;
+
+\ CREATE  CREATETST
+\ CREATE JEFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL_GUID 0xdd9e7534 L, 0x7762 W, 0x4698 W, 0x8c C, 0x14 C, 0xf5 C, 0x85 C, 0x17 C, 0xa6 C, 0x25 C, 0xaa C,
+\ TALIGN
+CREATE EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL_GUID 0xdd9e7534 L, 0x7762 W, 0x4698 W, 0x8c C, 0x14 C, 0xf5 C, 0x85 C, 0x17 C, 0xa6 C, 0x25 C, 0xaa C,
+CREATE EFI_LOADED_IMAGE_PROTOCOL_GUID  0x5B1B31A1 L, 0x9562 W, 0x11d2 W, 0x8E C, 0x3F C, 0x00 C, 0xA0 C, 0xC9 C, 0x69 C, 0x72 C, 0x3B C,
+CREATE EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID 0x964e5b22 L, 0x6459 W, 0x11d2 W, 0x8e C, 0x39 C, 0x0 C, 0xa0 C, 0xc9 C, 0x69 C, 0x72 C, 0x3b C,
+
+\ _EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL
+0
+	*FIELD OI.Reset
+	*FIELD ReadKeyStrokeEx
+	*FIELD WaitForKeyEx
+	*FIELD KX_SetState
+	*FIELD RegisterKeyNotify
+	*FIELD UnregisterKeyNotify
+ DROP
+
+ 0
+	2 FIELD	ScanCode
+	2 FIELD	UnicodeChar
+	4 FIELD	KeyShiftState
+	1 FIELD	KeyToggleState
+7 + 7 ANDC
+CONSTANT EFI_KEY_DATA
+
+ 0
+	8FIELD Signature
+	4FIELD TH_Revision
+	4FIELD HeaderSize
+	4FIELD CRC32
+	4+ \  Reserved
+ CONSTANT /EFI_TABLE_HEADER
+
+  0
+    /EFI_TABLE_HEADER FIELD T_Hdr
+
+	*FIELD *FirmwareVendor
+	4FIELD FirmwareRevision
+
+	*FIELD ConsoleInHandle
+	*FIELD ST*ConIn
+
+	*FIELD ConsoleOutHandle
+	*FIELD ST*ConOut
+
+	*FIELD StandardErrorHandle
+	*FIELD ST*StdErr
+
+	*FIELD *RuntimeServices
+	*FIELD *BootServices
+
+	4FIELD NumberOfTableEntries;
+	*FIELD *ConfigurationTable;
+
+ CONSTANT /EFI_SYSTEM_TABLE
+
+    /EFI_TABLE_HEADER \  T_Hdr
+
+    \
+    \ Task priority functions
+    \
+
+    *FIELD                   RaiseTPL
+    *FIELD                 RestoreTPL
+
+    \
+    \ Memory functions
+    \
+
+    *FIELD AllocatePages
+    *FIELD BS_FreePages
+    *FIELD GetMemoryMap
+    *FIELD BS_AllocatePool
+    *FIELD BS_FreePool
+
+    \
+    \ Event & timer functions
+    \
+
+    *FIELD CreateEvent
+    *FIELD BS_SetTimer
+    *FIELD WaitForEvent
+    *FIELD SignalEvent
+    *FIELD CloseEvent
+    *FIELD CheckEvent
+
+    \
+    \ Protocol handler functions
+    \
+
+    *FIELD  InstallProtocolInterface
+    *FIELD ReinstallProtocolInterface
+    *FIELD UninstallProtocolInterface
+    *FIELD             HandleProtocol
+    *FIELD             PCHandleProtocol
+    *FIELD    RegisterProtocolNotify
+    *FIELD               LocateHandle
+    *FIELD          LocateDevicePath
+    *FIELD InstallConfigurationTable
+
+    \
+    \ Image functions
+    \
+
+    *FIELD                  LoadImage
+    *FIELD                 StartImage
+    *FIELD                       BS_Exit
+    *FIELD                UnloadImage
+    *FIELD          ExitBootServices
+
+    \
+    \ Misc functions
+    \
+
+    *FIELD    GetNextMonotonicCount
+    *FIELD                       BS_Stall
+    *FIELD          SetWatchdogTimer
+
+    \
+    \ DriverSupport Services
+    \
+
+    *FIELD          ConnectController
+    *FIELD       DisconnectController
+
+    \
+    \ Open and Close Protocol Services
+    \
+    *FIELD               OpenProtocol
+    *FIELD              CloseProtocol
+    *FIELD   OpenProtocolInformation
+
+    \
+    \ Library Services
+    \
+    *FIELD        ProtocolsPerHandle
+    *FIELD        LocateHandleBuffer
+    *FIELD             LocateProtocol
+    *FIELD InstallMultipleProtocolInterfaces
+    *FIELD UninstallMultipleProtocolInterfaces
+
+    \
+    \ 32-bit CRC Services
+    \
+    *FIELD             CalculateCrc32
+
+    \
+    \ Misc Services
+    \
+    *FIELD                   BS_CopyMem
+    *FIELD                   BS_SetMem
+    *FIELD             CreateEventEx
+DROP
+
+\ EFI_LOADED_IMAGE_PROTOCOL
+    4 \ Revision
+    8FIELD LP_ParentHandle
+    *FIELD LP_SystemTable
+
+    \ Source location of image
+    8FIELD LP_DeviceHandle
+    *FIELD LP_FilePath 
+    8 + \	Reserved
+
+    // Images load options
+    4FIELD	LoadOptionsSize
+    *FIELD	LoadOptions
+
+    // Location of where image was loaded
+    *FIELD	LP_ImageBase
+    8FIELD	LP_ImageSize
+    8FIELD	LP_ImageCodeType
+    8FIELD	LP_ImageDataType
+
+    // If the driver image supports a dynamic unload request
+    *FIELD	LP_Unload
+DROP
+    8 \	Revision
+    *FIELD	OpenVolume
+DROP
+
+
+ 8 \ Revision
+ *FIELD F_Open
+ *FIELD F_Close
+ *FIELD F_Delete
+ *FIELD F_Read
+ *FIELD F_Write
+ *FIELD F_GetPosition
+ *FIELD F_SetPosition
+ *FIELD F_GetInfo
+ *FIELD F_SetInfo
+ *FIELD F_Flush
+ *FIELD F_OpenEx
+ *FIELD F_ReadEx
+ *FIELD F_WriteEx
+ *FIELD F_FlushEx
+DROP
+
+	8 \ OI.Reset
+	*FIELD OutputString
+	*FIELD TestString
+
+	*FIELD QueryMode
+	*FIELD OI.SetMode
+	*FIELD OI.SetAttribute
+
+	*FIELD ClearScreen
+	*FIELD SetCursorPosition
+	*FIELD EnableCursor
+
+    \ Current mode
+	*FIELD IO*Mode
+ DROP
+[IFNDEF] UZTYPE
+: UZTYPE ( uzadr -- )
+ SYSTAB ST*ConOut @
+ DUP OutputString @ 2XSYS DROP ;
+[THEN]
+
+: UZEMIT ( ucod -- ) >R RP@ UZTYPE RDROP ;
+
+' UZEMIT ->DEFER EMIT
+
+: TYPE_M ( c-addr1 u --- )
+\ Output the string starting at c-addr and length u to the terminal.
+\ CC_LINES
+  0 ?DO COUNT EMIT LOOP DROP
+;
+
+' TYPE_M ->DEFER TYPE
+
+: CR1 	$d EMIT	$a EMIT ;
+' CR1 ->defer CR
+
+VARIABLE TEXTINPUEX
+VARIABLE IVANTID
+CREATE KEYDATA EFI_KEY_DATA ALLOT
+
+: SHIFT+ $100 OR ;
+: CTL+   $200 OR ;
+: ALT+   $400 OR ;
+
+0 VALUE BOOTSERV
+0 VALUE VOLUME
+
+: KEY?EX ( -- flg )
+  TEXTINPUEX @ WaitForKeyEx @
+  BOOTSERV CheckEvent @ 1XSYS 0= ;
+
+: SHIFT@ KEYDATA KeyShiftState C@ $3 AND ;
+: CTL@ KEYDATA KeyShiftState C@ $C AND ;
+: ALT@ KEYDATA KeyShiftState C@ $60 AND ;
+
+' KEY?EX ->DEFER KEY?
+
+' NOOP ->DEFER CURSOR
+
+: KEYEX  ( -- key )
+  CURSOR
+  BEGIN	IVANTID
+	TEXTINPUEX @ WaitForKeyEx
+	1
+	BOOTSERV WaitForEvent @ 3XSYS DROP \ THROW 
+	KEYDATA  TEXTINPUEX @ DUP ReadKeyStrokeEx @ 2XSYS DROP \ THROW 
+	KEYDATA  UnicodeChar W@ 
+	KEYDATA  W@  16 << OR
+   	DUP $FF00FF AND 0=
+  WHILE DROP
+  REPEAT 
+ 
+\  SHIFT@ IF SHIFT+ THEN
+  CTL@ IF CTL+ THEN
+  ALT@ IF ALT+ THEN
+   CURSOR
+ ;
+
+' KEYEX ->DEFER KEY
+
+: TAB	9  EMIT ;
+
+T: HALIGNED  1+  1 ANDC ;
+T: IALIGNED  3 + 3 ANDC ;
+T: QALIGNED  7 + 7 ANDC ;
+
+CREATE ALIGN-BYTES 8 ,
+
+T: ALIGNED ( addr -- a-addr ) \ 94
+\ a-addr - первый выровненный адрес, больший или равный addr.
+  ALIGN-BYTES @ DUP 0= IF 1+ DUP ALIGN-BYTES ! THEN
+  2DUP
+  MOD DUP IF - + ELSE 2DROP THEN ;
+
+: (S")  ( --- c-addr u )
+\ Runtime part of S"
+\ It returns address and length of an in-line counted string.
+  R>  COUNT 2DUP + >R ;
+
+\+ '(S") ' (S") TO '(S")
+
+: (C")  ( --- c-addr )
+   R> DUP COUNT +  >R ;
+
+\+ '(C") ' (C") TO '(C")
+
+: DEPTH ( -- n ) \ 94
+  SP@ SP0 @ - NEGATE  3 ARSHIFT ;
+
+\ T: ERASE 0 FILL ;
+
+: WCOUNT DUP W@ SWAP 2+ SWAP ;
+
+: SPACE BL EMIT ;
+
+: 0MAX 0 MAX ;
+
+: 3DUP DUP 2OVER ROT ;
+
+: BOUNDS OVER + SWAP ;
+
+: CS-ROLL  2* 1+ DUP>R ROLL R> ROLL ;
+
+: D2*      ( D -- D*2 )        2DUP D+     ;
+: DABS     ( d -- ud )         DUP 0< IF DNEGATE THEN  ;
+
+: U/MOD 0 SWAP UM/MOD ;
+
+\ : U/ ( n1 n2 -- n1*n2 ) U/MOD  NIP ;
+
+\ : UMOD ( n1 n2 -- n1%n2 )  U/MOD DROP ;
+
+: MOVE ( addr1 addr2 u -- ) \ 94	
+  >R 2DUP SWAP R@ + U<
+  IF 2DUP U<
+     IF R> CMOVE> ELSE R> CMOVE THEN
+  ELSE R> CMOVE THEN ;
+
+\- MAX$@ $FF CONSTANT MAX$@
+
+: "CLIP"        ( a1 n1 -- a1 n1' )   \ clip a string to between 0 and MAXCOUNTED
+                0 MAX MAX$@ AND ( UMIN ) ;
+
+
+: $!         ( addr len dest -- )
+        SWAP "CLIP" SWAP
+	2DUP C! CHAR+ SWAP CMOVE ;
+
+
+: $+!       ( addr len dest -- ) \ append string addr,len to counted
+                                     \ string dest
+                >R "CLIP" MAX$@  R@ C@ -  MIN R>
+                                        \ clip total to MAXCOUNTED string
+	2DUP 2>R
+	COUNT  + SWAP CMOVE
+	2R> C+! ;
+
+: $C+!       ( c1 a1 -- )    \ append char c1 to the counted string at a1
+	DUP 1+! COUNT + 1- C! ;
+
+: C+PLACE $C+! ;
+
+: +NULL         ( a1 -- )       \ append a NULL just beyond the counted chars
+                COUNT + 0 SWAP C! ;
+
+
+: COMPARE ( addr1 u1 addr2 u2 --- diff )
+\ Compare two strings. diff is negative if addr1 u1 is smaller, 0 if it
+\ is equal and positive if it is greater than addr2 u2.
+
+  ROT 2DUP - >R        
+  MIN DUP IF
+   >R
+   BEGIN
+    OVER C@ OVER C@ - IF
+     SWAP C@ SWAP C@ -
+		 2RDROP	EXIT
+    THEN 
+    1+ SWAP 1+ SWAP
+    R> 1- DUP >R 0=
+   UNTIL R>
+  THEN DROP
+  2DROP R> NEGATE
+;
+
+: SCAN ( c-addr1 u1 c --- c-addr2 u2 )
+\ Find the first occurrence of character c in the string c-addr1 u1
+\ c-addr2 u2 is the remaining part of the string starting with that char.
+\ It is a zero-length string if c was not found.
+  BEGIN
+   OVER
+  WHILE
+   ROT DUP C@ >R OVER R> =
+   IF -ROT DROP
+   BREAK
+   1+ -ROT SWAP 1- SWAP
+  REPEAT DROP
+;
+
+: SEARCH ( c-addr1 u1 c-addr2 u2 -- c-addr3 u3 flag ) \ 94 STRING
+    2>R 2DUP
+    BEGIN
+      DUP 1+ R@ >
+    WHILE
+      OVER 2R@ TUCK COMPARE 0=
+      IF 2RDROP 2SWAP 2DROP TRUE EXIT THEN
+      1- SWAP 1+ SWAP
+    REPEAT 2RDROP 2DROP 0
+;
+
+: REL@ ( ADDR -- ADDR' )
+         DUP SL@ + ;
+
+: <'>
+R>  1+ DUP 4 + >R  REL@ 4 + ;
+
+T: >BODY 5 + ;
+
+$20 CONSTANT BL
+8 CONSTANT CELL
+0 CONSTANT FALSE
+-1 CONSTANT TRUE
+
+
+: CATCH ( i*x xt -- j*x 0 | i*x n ) \ 94 EXCEPTION
+\ Положить на стек исключений кадр перехвата исключительных ситуаций
+\ и выполнить токен xt (как по EXECUTE) таким образом, чтобы управление
+\ могло быть передано в точку сразу после CATCH, если во время выполнения
+\ xt выполняется THROW.
+\ Если выполнение xt заканчивается нормально (т.е. кадр исключений,
+\ положенный на стек словом CATCH не был взят выполнением THROW),
+\ взять кадр исключений и вернуть ноль на вершину стека данных,
+\ остальные элементы стека возвращаются xt EXECUTE. Иначе остаток
+\ семантики выполнения дается THROW.
+\  <SET-EXC-HANDLER>
+
+  SP@ >R  HANDLER @  >R
+  RP@ HANDLER !
+  EXECUTE
+  R> HANDLER !
+  RDROP
+  0
+;
+
+' CATCH TO 'CATCH
+
+: THROW
+\ Если любые биты n ненулевые, взять верхний кадр исключений со стека
+\ исключений, включая все на стеке возвратов над этим кадром. Затем
+\ восстановить спецификации входного потока, который использовался перед
+\ соответствующим CATCH, и установить глубины всех стеков, определенных
+\ в этом Стандарте, в то состояние, которое было сохранено в кадре
+\ исключений (i - это то же число, что и i во входных аргументах
+\ соответствующего CATCH), положить n на вершину стека данных и передать
+\ управление в точку сразу после CATCH, которое положило этот кадр
+\ исключений.
+\ Если вершина стека не ноль, и на стеке исключений есть кадр 
+\ исключений, то поведение следующее:
+\   Если n=-1, выполнить функцию ABORT (версию ABORT из слов CORE), 
+\   не выводя сообщений.
+\   Если n=-2, выполнить функцию ABORT" (версию ABORT" из слов CORE), 
+\   выводя символы ccc, ассоциированные с ABORT", генерирующим THROW.
+\   Иначе система может вывести на дисплей зависящее от реализации 
+\   сообщение об условии, соответствующем THROW с кодом n. Затем 
+\   система выполнит функцию ABORT (версию ABORT из CORE).
+  ?DUP
+  IF
+   ( SAVEERR )  HANDLER @ \ A@ 
+     ?DUP
+     IF
+      RP!
+        R> HANDLER !
+        R> SWAP >R
+        SP! DROP R>
+     ELSE
+\ FATAL-HANDLER
+ THEN
+  THEN
+;
+
+' THROW TO 'THROW 
+
+T: ABORT -1 THROW ;
+
+: ?THROW        \ k*x flag throw-code -- k*x|i*x n
+\ *G Perform a *\fo{THROW} of value *\i{throw-code} if flag is non-zero.
+  SWAP IF THROW THEN DROP
+;
+
+: SHORT? ( n -- -129 < n < 128 )
+  0x80 + 0x100 U< ;
+
+: LONG? ( n -- -2147483648<n<2147483647 )
+	$80000000 + $100000000 U< ;
+
+: HH.
+  DUP 0xF ANDC
+  IF DUP 0xF AND >R
+	4 RSHIFT
+	T_RECURSE R>
+  THEN
+    DUP 10 < 0= IF 7 + THEN 48 + EMIT
+;
+
+: HALT ( n -- )
+  0 0 ROT IMAGEHANDLE
+  BOOTSERV BS_Exit @ 4XSYS THROW ;
+
+: BYE 0 HALT ;
