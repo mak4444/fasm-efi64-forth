@@ -64,6 +64,8 @@
  FLOAD ForthLib\include\efiapi.4th 
  FLOAD ForthLib\include\efiprot.4th 
 
+REQUIRE { ForthLib\tools\locals.f
+
 \ - ROWS $28 VALUE ROWS
 \ - COLS $80 VALUE COLS
 
@@ -176,6 +178,7 @@ REQUIRE FCOPY ForthLib\tools\fcopy.4th
 REQUIRE NC ForthLib\tools\NNC.4th
 REQUIRE EFICALL ForthLib\lib\eficall.4th 
 
+
 :NONAME
 ." WORDS -  List the definition names" CR
 ." EDIT ( <filename> ) - text editor" CR
@@ -198,6 +201,11 @@ LASTSTP: BASETXT_MOD
 LASTSTP: GEMIT_MOD
 LASTSTP: nc
 LASTSTP: 0 NGETMAXXY H. H. H.
+
+LASTSTP: : TEST1 { a b } a . b . ;  1 2 TEST1
+LASTSTP: : TEST2 { a b \ c } a . b . c . ;  1 2 TEST2
+LASTSTP: : TEST3 { \ a b } a . b .  1 -> a  2 -> b  a . b . ; TEST3
+
 \ 5 TO MAX-VIEW-Y
 
 .( TRY) CR
